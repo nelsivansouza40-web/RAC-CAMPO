@@ -56,6 +56,72 @@ window.addEventListener('beforeinstallprompt', (e) => {
   if (location.hash === '' || location.hash === '#/') renderInicio();
 });
 
+/* Aviso de instalação ao abrir o link no celular (some por 3 dias com "Agora não"). */
+const CHAVE_AVISO_INSTALAR = 'avisoInstalarDispensadoEm';
+
+function avisoInstalarDispensadoRecente() {
+  try {
+    const em = Number(localStorage.getItem(CHAVE_AVISO_INSTALAR) || 0);
+    return em && (Date.now() - em) < 3 * 86400000;
+  } catch (e) {
+    return false;
+  }
+}
+
+function fecharAvisoInstalar(lembrar) {
+  const el = document.getElementById('aviso-instalar');
+  if (el) el.remove();
+  if (lembrar) {
+    try { localStorage.setItem(CHAVE_AVISO_INSTALAR, String(Date.now())); } catch (e) { /* sem armazenamento */ }
+  }
+}
+
+function mostrarAvisoInstalar() {
+  if (estaInstalado() || avisoInstalarDispensadoRecente()) return;
+  if (!window.matchMedia('(pointer: coarse)').matches) return;
+  let corpo;
+  if (ehIOS()) {
+    corpo = `<p>Para usar sem internet e não perder as auditorias, instale na tela de início:</p>
+      <ol>
+        <li>Abra este endereço no <strong>Safari</strong>.</li>
+        <li>Toque em <strong>Compartilhar</strong> (quadrado com seta para cima).</li>
+        <li>Escolha <strong>Adicionar à Tela de Início</strong> e confirme.</li>
+      </ol>`;
+  } else if (eventoInstalacao) {
+    corpo = `<p>Instale o aplicativo para abrir pela tela inicial e usar sem internet.</p>
+      <button type="button" class="btn grande" data-instalar-agora>Instalar aplicativo</button>`;
+  } else {
+    corpo = `<p>Para usar sem internet, instale na tela inicial: no Chrome, toque no menu <strong>⋮</strong> e escolha
+      <strong>Instalar aplicativo</strong> ou <strong>Adicionar à tela inicial</strong>.</p>`;
+  }
+  fecharAvisoInstalar(false);
+  const aviso = document.createElement('div');
+  aviso.id = 'aviso-instalar';
+  aviso.className = 'aviso-instalar';
+  aviso.setAttribute('role', 'dialog');
+  aviso.innerHTML = `<div class="aviso-instalar-caixa">
+      <strong>Instalar a Auditoria de RAC no celular</strong>
+      ${corpo}
+      <button type="button" class="btn sec" data-agora-nao>Agora não</button>
+    </div>`;
+  document.body.appendChild(aviso);
+  aviso.querySelector('[data-agora-nao]').onclick = () => fecharAvisoInstalar(true);
+  const btn = aviso.querySelector('[data-instalar-agora]');
+  if (btn) {
+    btn.onclick = async () => {
+      eventoInstalacao.prompt();
+      await eventoInstalacao.userChoice;
+      eventoInstalacao = null;
+      fecharAvisoInstalar(false);
+      renderInicio();
+    };
+  }
+}
+
+window.addEventListener('beforeinstallprompt', () => {
+  if (document.getElementById('aviso-instalar')) mostrarAvisoInstalar();
+});
+
 function cartaoInstalacao() {
   if (estaInstalado()) return '';
   if (ehIOS()) {
@@ -993,6 +1059,7 @@ function init() {
   atualizarConexao();
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   rotear();
+  setTimeout(mostrarAvisoInstalar, 1200);
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
