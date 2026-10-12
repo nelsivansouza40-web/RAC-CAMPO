@@ -4,7 +4,7 @@ Aplicativo (PWA) para auditorias de campo dos Requisitos de Atividades
 Críticas (RAC), feito para funcionar **sem internet**. As auditorias e as
 fotos ficam gravadas no próprio aparelho.
 
-**Endereço:** https://nelsivansouza40-web.github.io/rac-campo/
+**Endereço:** https://nelsivansouza40-web.github.io/RAC-CAMPO/
 
 O aplicativo tem repositório próprio para não ficar dentro do endereço do
 Inspeções SSMA (`/projetos-claude/`): instalado, o Inspeções SSMA abrange
