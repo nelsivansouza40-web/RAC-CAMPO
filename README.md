@@ -4,6 +4,12 @@ Aplicativo (PWA) para auditorias de campo dos Requisitos de Atividades
 Críticas (RAC), feito para funcionar **sem internet**. As auditorias e as
 fotos ficam gravadas no próprio aparelho.
 
+**Endereço:** https://nelsivansouza40-web.github.io/rac-campo/
+
+O aplicativo tem repositório próprio para não ficar dentro do endereço do
+Inspeções SSMA (`/projetos-claude/`): instalado, o Inspeções SSMA abrange
+todas as subpastas daquele endereço e abria o RAC dentro da própria janela.
+
 ## Conteúdo do checklist
 
 Cada RAC tem no mínimo 15 itens (287 no total, incluindo as observações
